@@ -1,6 +1,3 @@
-import pkgutil
-__path__ = pkgutil.extend_path(__path__, __name__)  # @ReservedAssignment
-
 import abc
 
 class Delta(abc.ABC):
@@ -148,6 +145,7 @@ class InMemoryPandasVersionControl(TimeSeriesVersionControl):
         super().__init__(fetch_data_copy=lambda data, index=0, count=None: data.iloc[index:index+(len(data) if count is None else count)])
 
     def apply_insert_rows_delta(self, data, delta):
+        import pandas as pd
         if data is None:
             data = delta.subdata_after
         else:
@@ -164,22 +162,3 @@ class InMemoryPandasVersionControl(TimeSeriesVersionControl):
     def apply_delete_rows_delta(self, data, delta):
         del data.iloc[delta.effective_index():delta.effective_index() + delta.count]
         return data
-
-if __name__ == '__main__':
-    import pandas as pd
-    tsvc = InMemoryPandasVersionControl()
-    tsvc.insert_rows(pd.DataFrame({'a': [10., 20.], 'b': [2.3, 2.1]}, index=[10, 20]))
-    tsvc.insert_rows(pd.DataFrame({'a': [30., 40., 50.], 'b': [2.1, 2.1, 2.2]}, index=[30, 40, 50]))
-    tsvc.insert_rows(pd.DataFrame({'a': [5], 'b': [2.2]}, index=[5]), index=0)
-    print('Revision 0:')
-    print(tsvc.get_revision(0))
-    print('Revision 0:')
-    print(tsvc.get_revision(0))
-    print('Revision 1:')
-    print(tsvc.get_revision(1))
-    print('Revision 0:')
-    print(tsvc.get_revision(0))
-    print('Revision 1:')
-    print(tsvc.get_revision(1))
-    print('Revision 2:')
-    print(tsvc.get_revision(2))
