@@ -1,4 +1,4 @@
-import thalesians.tsvc.deltalogs as deltalogs
+import thalesians.tsvc.delta_logs as deltalogs
 
 class InMemoryDeltaLog(deltalogs.DeltaLog):
     def __init__(self):

@@ -1,6 +1,6 @@
 import pandas as pd
 
-import thalesians.tsvc.tsimpls as tsimpls
+import thalesians.tsvc.ts_impls as tsimpls
 
 class PandasTimeSeriesImpl(tsimpls.TimeSeriesImpl):
     def __init__(self):

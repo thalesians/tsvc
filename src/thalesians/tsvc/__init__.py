@@ -1,10 +1,10 @@
 import thalesians.tsvc.deltas as deltas
 
 class TimeSeriesVersionControl(object):
-    def __init__(self, delta_log, time_series_impl):
+    def __init__(self, delta_log, time_series_impl, revision_cache):
         self._delta_log = delta_log
         self._time_series_impl = time_series_impl
-        self._revision_cache = {}
+        self._revision_cache = revision_cache
         self._row_count = 0
 
     def apply_delta(self, data, delta):
@@ -32,8 +32,11 @@ class TimeSeriesVersionControl(object):
         delta = deltas.DeleteRowsDelta(self._row_count, index, count, self._time_series_impl.fetch_data_copy(self._data, index, count))
         self._row_count -= count
         self._delta_log.append(delta)
+        
+    def get_revisions(self):
+        return range(len(self._delta_log))
 
-    def get_revision(self, revision, cache_result=True):
+    def fetch_revision(self, revision, cache_result=True):
         result = None
         if revision in self._revision_cache:
             result = self._revision_cache[revision]
