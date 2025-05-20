@@ -16,7 +16,9 @@ class InMemoryRevisionCache(revisioncaches.RevisionCache):
         return self._cache[key]
 
     def __setitem__(self, key, value):
-        self._cache[key] = value
+        if key in self._cache:
+            raise KeyError(f"Key {key} already exists in cache")
+        self._cache[key] = value.copy()
         if len(self._cache) > self._max_size:
             # Remove the oldest item if the cache exceeds max size
             oldest_key = next(iter(self._cache))

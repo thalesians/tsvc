@@ -1,25 +1,18 @@
-import os
 import tempfile
 import unittest
 
 import pandas as pd
 import pandas.testing as pdt
 
-import thalesians.tsvc.vc as vc
-import thalesians.tsvc.delta_logs.pickle_delta_log as pickledl
-import thalesians.tsvc.revision_caches.pickle_revision_cache as revcaches
-import thalesians.tsvc.ts_impls.pandas_ts_impl as pdtsimpl
+import thalesians.tsvc.store.pickle_store
 
 class TestPickleDeltaLog(unittest.TestCase):
     def test_basic(self):
-        temp_dir = tempfile.TemporaryDirectory(delete=False)
-        delta_log_dir_path = temp_dir.name
-        delta_log = pickledl.PickleDeltaLog(dir_path=delta_log_dir_path)
-        time_series_impl = pdtsimpl.PandasTimeSeriesImpl()
-        revision_cache_dir_path = os.path.join(delta_log_dir_path, 'revision_cache')
-        os.makedirs(revision_cache_dir_path, exist_ok=True)
-        revision_cache = revcaches.PickleRevisionCache(dir_path=revision_cache_dir_path)
-        tsvc = vc.TimeSeriesVersionControl(delta_log=delta_log, time_series_impl=time_series_impl, revision_cache=revision_cache)
+        temp_dir = tempfile.TemporaryDirectory(delete=False)        
+        store_dir_path = temp_dir.name
+        store = thalesians.tsvc.store.pickle_store.PickleStore(dir_path=store_dir_path)
+        store.add("TS1")
+        tsvc = store["TS1"]
         tsvc.insert_rows(pd.DataFrame({'a': [10., 20.], 'b': [2.3, 2.1]}, index=[10, 20]))
         tsvc.insert_rows(pd.DataFrame({'a': [30., 40., 50.], 'b': [2.1, 2.1, 2.2]}, index=[30, 40, 50]))
         tsvc.insert_rows(pd.DataFrame({'a': [5.], 'b': [2.2]}, index=[5]), index=0)

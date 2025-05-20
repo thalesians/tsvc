@@ -6,12 +6,12 @@ class DeltaLog(abc.ABC):
     
     @abc.abstractmethod
     def append(self, delta):
-        raise NotImplementedError
+        raise NotImplementedError("This method should be implemented by subclasses")
     
     @abc.abstractmethod
     def __getitem__(self, index):
-        raise NotImplementedError
+        raise NotImplementedError("This method should be implemented by subclasses")
     
     @abc.abstractmethod
     def __len__(self):
-        raise NotImplementedError
+        raise NotImplementedError("This method should be implemented by subclasses")
