@@ -1,38 +1,51 @@
-import pandas as pd
+import copy
+
+import polars as pl
 
 import thalesians.tsvc.ts_impls as tsimpls
 
-class PandasTimeSeriesImpl(tsimpls.TimeSeriesImpl):
+class PolarsTimeSeriesImpl(tsimpls.TimeSeriesImpl):
     def fetch_data_copy(self, data, index=0, count=None):
-        return data.iloc[index:index+(len(data) if count is None else count)].copy(deep=True)
+        return copy.deepcopy(data[index:index+(len(data) if count is None else count)])
 
     def apply_insert_rows_delta(self, data, delta):
         if data is None:
-            data = delta.subdata_after.copy(deep=True)
+            data = copy.deepcopy(delta.subdata_after)
         else:
-            first = data.iloc[:delta.effective_index()]
+            first = data[:delta.effective_index()]
             second = delta.subdata_after
-            third = data.iloc[delta.effective_index():]
-            data = pd.concat([first, second, third])
+            third = data[delta.effective_index():]
+            data = pl.concat([first, second, third])
         return self.fetch_data_copy(data)
 
     def apply_update_rows_delta(self, data, delta):
         data = self.fetch_data_copy(data)
-        columns = delta.columns if delta.columns is not None else data.columns
-        column_indices = [data.columns.get_loc(col) for col in columns]
-        data.iloc[delta.effective_index():delta.effective_index() + len(delta.subdata_after), column_indices] = delta.subdata_after
-        return self.fetch_data_copy(data)
+        replacement = copy.deepcopy(delta.subdata_after)
+        index = delta.effective_index()
+        count = len(delta.subdata_after)
+        columns_to_update = list(data.columns) if delta.columns is None else delta.columns
+        for column in data.columns:
+            if column not in columns_to_update:
+                replacement = replacement.with_columns(
+                    data[column].slice(index, count).alias(column)
+                )
+        replacement = replacement.select(data.columns)
+        return self.fetch_data_copy(pl.concat([
+            data[:index],
+            replacement,
+            data[index + count:]
+        ]))
 
     def apply_delete_rows_delta(self, data, delta):
         data = self.fetch_data_copy(data)
-        first = data.iloc[:delta.effective_index()]
-        second = data.iloc[delta.effective_index() + delta.count:]
-        return self.fetch_data_copy(pd.concat([first, second]))
+        first = data[:delta.effective_index()]
+        second = data[delta.effective_index() + delta.count:]
+        return self.fetch_data_copy(pl.concat([first, second]))
 
     def apply_append_columns_delta(self, data, delta):
         data = self.fetch_data_copy(data)
         for column, column_data in delta.columns_to_add.items():
-            data[column] = column_data.copy(deep=True)
+            data[column] = copy.deepcopy(column_data)
         return self.fetch_data_copy(data)
     
     def apply_delete_columns_delta(self, data, delta):

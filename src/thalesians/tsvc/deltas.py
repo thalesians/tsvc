@@ -1,4 +1,5 @@
 import abc
+import copy
 import datetime as dt
 import os
 
@@ -41,7 +42,7 @@ class InsertRowsDelta(Delta):
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = DeleteRowsDelta(row_count_before + len(subdata_after), self._index, len(self._subdata_after), self._subdata_after.copy(), inverse=self)
+            self._inverse = DeleteRowsDelta(row_count_before + len(subdata_after), self._index, len(self._subdata_after), copy.deepcopy(self._subdata_after), inverse=self)
 
     @property
     def subdata_after(self):
@@ -57,7 +58,7 @@ class UpdateRowsDelta(Delta):
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = UpdateRowsDelta(row_count_before, self._index, subdata_after.copy(), subdata_before.copy(), inverse=self)
+            self._inverse = UpdateRowsDelta(row_count_before, self._index, copy.deepcopy(subdata_after), copy.deepcopy(subdata_before), inverse=self)
 
     @property
     def subdata_after(self):
@@ -75,7 +76,7 @@ class DeleteRowsDelta(Delta):
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = InsertRowsDelta(row_count_before - count, self._index, subdata_before.copy(), inverse=self)
+            self._inverse = InsertRowsDelta(row_count_before - count, self._index, copy.deepcopy(subdata_before), inverse=self)
 
     @property
     def count(self):
@@ -88,7 +89,7 @@ class AppendColumnsDelta(Delta):
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = DeleteColumnsDelta(row_count_before, columns_to_add.copy(), inverse=self)
+            self._inverse = DeleteColumnsDelta(row_count_before, copy.deepcopy(columns_to_add), inverse=self)
             
     @property
     def columns_to_add(self):
@@ -101,7 +102,7 @@ class DeleteColumnsDelta(Delta):
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = AppendColumnsDelta(row_count_before, columns_to_delete.copy(), inverse=self)
+            self._inverse = AppendColumnsDelta(row_count_before, copy.deepcopy(columns_to_delete), inverse=self)
             
     @property
     def columns_to_delete(self):
@@ -145,7 +146,7 @@ class InsertMetaDataDelta(Delta):
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = DeleteMetaDataDelta(row_count_before + 1, self._index, meta_data.copy(), inverse=self)
+            self._inverse = DeleteMetaDataDelta(row_count_before + 1, self._index, copy.deepcopy(meta_data), inverse=self)
             
     @property
     def meta_data(self):
@@ -159,7 +160,7 @@ class UpdateMetaDataDelta(Delta):
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = UpdateMetaDataDelta(row_count_before, self._index, meta_data_after.copy(), meta_data_before.copy(), inverse=self)
+            self._inverse = UpdateMetaDataDelta(row_count_before, self._index, copy.deepcopy(meta_data_after), copy.deepcopy(meta_data_before), inverse=self)
             
     @property
     def meta_data_after(self):
@@ -176,7 +177,7 @@ class DeleteMetaDataDelta(Delta):
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = InsertMetaDataDelta(row_count_before - 1, self._index, meta_data.copy(), inverse=self)
+            self._inverse = InsertMetaDataDelta(row_count_before - 1, self._index, copy.deepcopy(meta_data), inverse=self)
             
     @property
     def meta_data(self):

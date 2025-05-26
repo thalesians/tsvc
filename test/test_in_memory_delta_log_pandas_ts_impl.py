@@ -6,12 +6,12 @@ import pandas.testing as pdt
 import thalesians.tsvc.vc as vc
 import thalesians.tsvc.delta_logs.in_memory_delta_log as mem
 import thalesians.tsvc.revision_caches.in_memory_revision_cache as revcaches
-import thalesians.tsvc.ts_impls.pandas_ts_impl as pdtsimpl
+import thalesians.tsvc.ts_impls.pandas_ts_impl as pandas_ts_impl
 
-class TestInMemoryDeltaLog(unittest.TestCase):
+class TestInMemoryDeltaLogModinTSImpl(unittest.TestCase):
     def test_basic(self):
         delta_log = mem.InMemoryDeltaLog()
-        time_series_impl = pdtsimpl.PandasTimeSeriesImpl()
+        time_series_impl = pandas_ts_impl.PandasTimeSeriesImpl()
         revision_cache = revcaches.InMemoryRevisionCache()
         tsvc = vc.TimeSeriesVersionControl(delta_log=delta_log, time_series_impl=time_series_impl, revision_cache=revision_cache)
         tsvc.insert_rows(pd.DataFrame({'a': [10., 20.], 'b': [2.3, 2.1]}, index=[10, 20]))
