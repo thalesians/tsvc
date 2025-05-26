@@ -8,7 +8,7 @@ import thalesians.tsvc.delta_logs.in_memory_delta_log as mem
 import thalesians.tsvc.revision_caches.in_memory_revision_cache as revcaches
 import thalesians.tsvc.ts_impls.polars_ts_impl as polars_ts_impl
 
-class TestInMemoryDeltaLogModinTSImpl(unittest.TestCase):
+class TestInMemoryDeltaLogPolarsTSImpl(unittest.TestCase):
     def test_basic(self):
         delta_log = mem.InMemoryDeltaLog()
         time_series_impl = polars_ts_impl.PolarsTimeSeriesImpl()
