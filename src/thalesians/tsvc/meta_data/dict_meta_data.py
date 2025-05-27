@@ -17,10 +17,7 @@ class DictMetaData(meta_data_module.MetaData):
         raise KeyError(f"Key '{key}' not found in meta data.")
     
     def __setitem__(self, key, value):
-        if key in self._meta_data:
-            self._meta_data[key] = value
-        else:
-            raise KeyError(f"Key '{key}' not found in meta data.")
+        self._meta_data[key] = value
         
     def __delitem__(self, key):
         if key in self._meta_data:

@@ -83,17 +83,17 @@ class DeleteRowsDelta(Delta):
         return self._count
 
 class AppendColumnsDelta(Delta):
-    def __init__(self, row_count_before, columns_to_add, inverse=None, timestamp=None, user=None):
+    def __init__(self, row_count_before, columns_to_append, inverse=None, timestamp=None, user=None):
         super().__init__(row_count_before, 0, timestamp, user)
-        self._columns_to_add = columns_to_add
+        self._columns_to_append = columns_to_append
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = DeleteColumnsDelta(row_count_before, copy.deepcopy(columns_to_add), inverse=self)
+            self._inverse = DeleteColumnsDelta(row_count_before, copy.deepcopy(columns_to_append), inverse=self)
             
     @property
-    def columns_to_add(self):
-        return self._columns_to_add
+    def columns_to_append(self):
+        return self._columns_to_append
             
 class DeleteColumnsDelta(Delta):
     def __init__(self, row_count_before, columns_to_delete, inverse=None, timestamp=None, user=None):
@@ -171,17 +171,17 @@ class UpdateMetaDataDelta(Delta):
         return self._meta_data_before
     
 class DeleteMetaDataDelta(Delta):
-    def __init__(self, row_count_before, index, meta_data, inverse=None, timestamp=None, user=None):
+    def __init__(self, row_count_before, index, meta_data_to_delete, inverse=None, timestamp=None, user=None):
         super().__init__(row_count_before, index, timestamp, user)
-        self._meta_data = meta_data
+        self._meta_data_to_delete = copy.deepcopy(meta_data_to_delete)
         if inverse is not None:
             self._inverse = inverse
         else:
-            self._inverse = InsertMetaDataDelta(row_count_before - 1, self._index, copy.deepcopy(meta_data), inverse=self)
+            self._inverse = InsertMetaDataDelta(row_count_before - 1, self._index, copy.deepcopy(meta_data_to_delete), inverse=self)
             
     @property
-    def meta_data(self):
-        return self._meta_data
+    def meta_data_to_delete(self):
+        return self._meta_data_to_delete
 
 class ReorderMetaDataDelta(Delta):
     def __init__(self, row_count_before, meta_data_ordering_before, meta_data_ordering_after, inverse=None, timestamp=None, user=None):

@@ -44,7 +44,7 @@ class PolarsTimeSeriesImpl(tsimpls.TimeSeriesImpl):
 
     def apply_append_columns_delta(self, data, delta):
         data = self.fetch_data_copy(data)
-        for column, column_data in delta.columns_to_add.items():
+        for column, column_data in delta.columns_to_append.items():
             data[column] = copy.deepcopy(column_data)
         return self.fetch_data_copy(data)
     

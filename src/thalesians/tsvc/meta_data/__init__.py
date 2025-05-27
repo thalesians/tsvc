@@ -31,3 +31,7 @@ class MetaData(object):
     @abc.abstractmethod
     def reorder(self, new_order):
         raise NotImplementedError("This method should be implemented by subclasses")
+
+    def __eq__(self, other):
+        return list(self.keys()) == list(other.keys()) and all(self[key] == other[key] for key in self.keys())
+    

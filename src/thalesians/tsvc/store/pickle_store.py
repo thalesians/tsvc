@@ -2,7 +2,8 @@ import os
 
 import thalesians.tsvc.vc as vc
 import thalesians.tsvc.delta_logs.pickle_delta_log as pickledl
-import thalesians.tsvc.revision_caches.pickle_revision_cache as revcaches
+import thalesians.tsvc.meta_data_caches.pickle_meta_data_cache as meta_data_caches
+import thalesians.tsvc.revision_caches.pickle_revision_cache as revision_caches
 import thalesians.tsvc.store as store
 import thalesians.tsvc.ts_impls.pandas_ts_impl as pdtsimpl
 
@@ -51,5 +52,7 @@ class PickleStore(store.Store):
         time_series_impl = pdtsimpl.PandasTimeSeriesImpl()
         revision_cache_dir_path = os.path.join(self._dir_path, str(index), 'revision_cache')
         os.makedirs(revision_cache_dir_path, exist_ok=True)
-        revision_cache = revcaches.PickleRevisionCache(dir_path=revision_cache_dir_path)
-        return vc.TimeSeriesVersionControl(delta_log=delta_log, time_series_impl=time_series_impl, revision_cache=revision_cache)
+        revision_cache = revision_caches.PickleRevisionCache(dir_path=revision_cache_dir_path)
+        meta_data_cache_dir_path = os.path.join(self._dir_path, str(index), 'meta_data_cache')
+        meta_data_cache = meta_data_caches.PickleMetaDataCache(dir_path=meta_data_cache_dir_path)
+        return vc.TimeSeriesVersionControl(delta_log=delta_log, time_series_impl=time_series_impl, revision_cache=revision_cache, meta_data_cache=meta_data_cache)

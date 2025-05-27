@@ -1,5 +1,8 @@
+import copy
+
 import pandas as pd
 
+import thalesians.tsvc.meta_data.dict_meta_data as dict_meta_data
 import thalesians.tsvc.ts_impls as tsimpls
 
 class PandasTimeSeriesImpl(tsimpls.TimeSeriesImpl):
@@ -31,8 +34,8 @@ class PandasTimeSeriesImpl(tsimpls.TimeSeriesImpl):
 
     def apply_append_columns_delta(self, data, delta):
         data = self.fetch_data_copy(data)
-        for column, column_data in delta.columns_to_add.items():
-            data[column] = column_data.copy(deep=True)
+        for column, column_data in delta.columns_to_append.items():
+            data[column] = copy.deepcopy(column_data)
         return self.fetch_data_copy(data)
     
     def apply_delete_columns_delta(self, data, delta):
@@ -52,19 +55,21 @@ class PandasTimeSeriesImpl(tsimpls.TimeSeriesImpl):
         return self.fetch_data_copy(data)
     
     def apply_insert_meta_data_delta(self, meta_data, delta):
+        if meta_data is None:
+            meta_data = dict_meta_data.DictMetaData()
         for key, value in delta.meta_data.items():
             assert key not in meta_data, f"Key '{key}' already exists in meta data"
             meta_data[key] = value
         return meta_data
     
     def apply_update_meta_data_delta(self, meta_data, delta):
-        for key, value in delta.meta_data.items():
+        for key, value in delta.meta_data_after.items():
             assert key in meta_data, f"Key '{key}' does not exist in meta data"
             meta_data[key] = value
         return meta_data
     
     def apply_delete_meta_data_delta(self, meta_data, delta):
-        for key in delta.meta_data.keys():
+        for key in delta.meta_data_to_delete.keys():
             assert key in meta_data, f"Key '{key}' does not exist in meta data"
             del meta_data[key]
         return meta_data

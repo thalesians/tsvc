@@ -1,7 +1,7 @@
 import thalesians.tsvc.caches.in_memory_cache as in_memory_cache
-import thalesians.tsvc.revision_caches as revision_caches
+import thalesians.tsvc.meta_data_caches as meta_data_caches
 
-class InMemoryRevisionCache(revision_caches.RevisionCache):
+class InMemoryMetaDataCache(meta_data_caches.MetaDataCache):
     def __init__(self, max_size=None):
         super().__init__()
         self._cache = in_memory_cache.InMemoryCache(max_size=max_size)
